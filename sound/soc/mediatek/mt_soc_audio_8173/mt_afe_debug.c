@@ -14,6 +14,7 @@
 #include "mt_afe_reg.h"
 #include "mt_afe_clk.h"
 #include <linux/debugfs.h>
+#include <linux/slab.h>
 #include <linux/uaccess.h>
 
 #define DEBUG_FS_BUFFER_SIZE 4096
@@ -27,8 +28,13 @@ struct mt_soc_audio_debug_fs {
 static ssize_t mt_soc_debug_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 {
 	const int size = DEBUG_FS_BUFFER_SIZE;
-	char buffer[size];
+	char *buffer;
+	ssize_t ret;
 	int n = 0;
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if (!buffer)
+		return -ENOMEM;
 
 	mt_afe_main_clk_on();
 
@@ -290,7 +296,9 @@ static ssize_t mt_soc_debug_read(struct file *file, char __user *buf, size_t cou
 
 	mt_afe_main_clk_off();
 
-	return simple_read_from_buffer(buf, count, pos, buffer, n);
+	ret = simple_read_from_buffer(buf, count, pos, buffer, n);
+	kfree(buffer);
+	return ret;
 }
 
 static ssize_t mt_soc_debug_write(struct file *file, const char __user *user_buf,
@@ -335,8 +343,13 @@ static ssize_t mt_soc_hdmi_debug_read(struct file *file, char __user *buf,
 				size_t count, loff_t *pos)
 {
 	const int size = DEBUG_FS_BUFFER_SIZE;
-	char buffer[size];
+	char *buffer;
+	ssize_t ret;
 	int n = 0;
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if (!buffer)
+		return -ENOMEM;
 
 	mt_afe_main_clk_on();
 
@@ -409,15 +422,22 @@ static ssize_t mt_soc_hdmi_debug_read(struct file *file, char __user *buf,
 
 	mt_afe_main_clk_off();
 
-	return simple_read_from_buffer(buf, count, pos, buffer, n);
+	ret = simple_read_from_buffer(buf, count, pos, buffer, n);
+	kfree(buffer);
+	return ret;
 }
 
 static ssize_t mt_soc_spdif_debug_read(struct file *file, char __user *buf,
 				size_t count, loff_t *pos)
 {
 	const int size = DEBUG_FS_BUFFER_SIZE;
-	char buffer[size];
+	char *buffer;
+	ssize_t ret;
 	int n = 0;
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if (!buffer)
+		return -ENOMEM;
 
 	mt_afe_main_clk_on();
 
@@ -536,7 +556,9 @@ static ssize_t mt_soc_spdif_debug_read(struct file *file, char __user *buf,
 		       mt_afe_pll_get_reg(AUDIO_APLL2_PWR_CON0));
 
 	mt_afe_main_clk_off();
-	return simple_read_from_buffer(buf, count, pos, buffer, n);
+	ret = simple_read_from_buffer(buf, count, pos, buffer, n);
+	kfree(buffer);
+	return ret;
 }
 
 static const struct file_operations mtaudio_debug_ops = {

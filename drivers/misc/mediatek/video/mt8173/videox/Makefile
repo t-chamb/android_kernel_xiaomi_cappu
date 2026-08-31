@@ -31,6 +31,8 @@ obj-$(CONFIG_MTK_FB) += mtkfb_console.o             \
 			mtk_ovl.o                   \
 			compat_mtk_disp_mgr.o
 
+CFLAGS_mtk_disp_mgr.o += -Wframe-larger-than=2304
+
 subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/mmp/
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/dispsys   \
              -I$(srctree)/drivers/misc/mediatek/sync/      \

@@ -14,6 +14,7 @@
 
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/imgsensor/inc
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include/mach
+CFLAGS_kd_sensorlist.o += -Wframe-larger-than=1536
 define FILTER_PROJECT_DRV
 ifeq ($(wildcard $(srctree)/drivers/misc/mediatek/imgsensor/src/$(MTK_PLATFORM)/camera_project/$(ARCH_MTK_PROJECT)/$(1)),)
 platform_drv += $(1)

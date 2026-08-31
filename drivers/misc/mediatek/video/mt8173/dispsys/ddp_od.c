@@ -29,12 +29,6 @@
 #include "ddp_log.h"
 #include "lcm_drv.h"
 
-typedef unsigned char UINT8;
-typedef signed char INT8;
-typedef unsigned short UINT16;
-typedef unsigned int UINT32;
-typedef signed int INT32;
-
 #define OD_USE_CMDQ     0
 
 #define OD_TBL_S_DIM	17
@@ -710,7 +704,7 @@ static void _od_set_param(int manual_comp, int image_width, int image_height)
 	/* set auto 8bit parameters */
 	if (image_width > 1900) {
 		OD_REG_SET_FIELD(OD_REG35, (140000 << 0), DET8B_DC_NUM);
-		OD_REG_SET_FIELD(OD_REG36, (40000 << 18), DET8B_BTC_NUM);
+		OD_REG_SET_FIELD(OD_REG36, 40000, DET8B_BTC_NUM);
 		OD_REG_SET_FIELD(OD_REG37, (1900000 >> 4), DET8B_BIT_MGN);
 	} else {
 		OD_REG_SET_FIELD(OD_REG35, 70000, DET8B_DC_NUM);

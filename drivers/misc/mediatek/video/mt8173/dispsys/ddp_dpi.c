@@ -723,7 +723,7 @@ int ddp_dpi_config(DISP_MODULE_ENUM module, disp_ddp_path_config *config, void *
 		case DISP_MODULE_DPI0:
 			{
 				ddp_dpi_ConfigPclk(module, cmdq_handle, dpi_config->dpi_clock,
-						   dpi_config->clk_pol);
+						   (DPI_POLARITY)dpi_config->clk_pol);
 				ddp_dpi_ConfigSize(module, cmdq_handle, dpi_config->width,
 						   Is_interlace_resolution(dpi_config->dpi_clock) ?
 						   dpi_config->height / 2 : dpi_config->height);
@@ -754,11 +754,11 @@ int ddp_dpi_config(DISP_MODULE_ENUM module, disp_ddp_path_config *config, void *
 
 		ddp_dpi_ConfigBG(module, cmdq_handle, true, dpi_config->bg_width,
 				 dpi_config->bg_height);
-		ddp_dpi_ConfigDE(module, cmdq_handle, dpi_config->de_pol);
-		ddp_dpi_ConfigVsync(module, cmdq_handle, dpi_config->vsync_pol,
+		ddp_dpi_ConfigDE(module, cmdq_handle, (DPI_POLARITY)dpi_config->de_pol);
+		ddp_dpi_ConfigVsync(module, cmdq_handle, (DPI_POLARITY)dpi_config->vsync_pol,
 				    dpi_config->vsync_pulse_width, dpi_config->vsync_back_porch,
 				    dpi_config->vsync_front_porch);
-		ddp_dpi_ConfigHsync(module, cmdq_handle, dpi_config->hsync_pol,
+		ddp_dpi_ConfigHsync(module, cmdq_handle, (DPI_POLARITY)dpi_config->hsync_pol,
 				    dpi_config->hsync_pulse_width, dpi_config->hsync_back_porch,
 				    dpi_config->hsync_front_porch);
 

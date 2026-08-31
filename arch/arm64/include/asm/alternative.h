@@ -37,8 +37,7 @@ void free_alternatives_memory(void);
 	newinstr "\n"							\
 	"664:\n\t"							\
 	".popsection\n\t"						\
-	".if ((664b-663b) != (662b-661b))\n\t"				\
-	"	.error \"Alternatives instruction length mismatch\"\n\t"\
-	".endif\n"
+	".org . - (664b-663b) + (662b-661b)\n\t"			\
+	".org . - (662b-661b) + (664b-663b)\n"
 
 #endif /* __ASM_ALTERNATIVE_H */

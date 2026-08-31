@@ -252,9 +252,9 @@ static int mt_pcm_hdmi_raw_stop(struct snd_pcm_substream *substream)
 
 	mt_afe_enable_afe(false);
 
-	mt_afe_reset_dma_buffer(MT_AFE_DIGITAL_BLOCK_HDMI_RAW);
+	mt_afe_reset_dma_buffer(MT_AFE_MEM_CTX_HDMI_RAW);
 
-	mt_afe_remove_ctx_substream(MT_AFE_DIGITAL_BLOCK_HDMI_RAW);
+	mt_afe_remove_ctx_substream(MT_AFE_MEM_CTX_HDMI_RAW);
 
 	mt_afe_spdif_clk_off();
 	mt_afe_disable_apll_div_power(MT_AFE_SPDIF, runtime->rate);

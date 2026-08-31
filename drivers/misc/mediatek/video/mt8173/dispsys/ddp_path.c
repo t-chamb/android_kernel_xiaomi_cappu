@@ -35,7 +35,6 @@
 #include <linux/of_irq.h>
 #include <linux/of_address.h>
 #endif
-#pragma GCC optimize("O0")
 
 typedef struct module_map_s {
 	DISP_MODULE_ENUM module;

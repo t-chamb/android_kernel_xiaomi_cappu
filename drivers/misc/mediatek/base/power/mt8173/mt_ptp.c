@@ -833,7 +833,10 @@ static int base_ops_mon_mode(struct ptp_det *det)
 			, det->PTPINITEN, det->PTPMONEN);
 	}
 
-	ts_name = det->ctrl_id;	/* TODO: FIXME */
+	ts_name = (det_to_id(det) == PTP_DET_LITTLE) ? THERMAL_CA7 :
+			(det_to_id(det) == PTP_DET_BIG) ? THERMAL_CA15 :
+			(det_to_id(det) == PTP_DET_GPU) ? THERMAL_GPU :
+			THERMAL_CORE;
 	get_thermal_slope_intercept(&ts_info, ts_name);
 	det->MTS = ts_info.ts_MTS;
 	det->BTS = ts_info.ts_BTS;
@@ -2635,7 +2638,7 @@ void mt_ptp_opp_status(ptp_det_id id, unsigned int *temp,
 	FUNC_ENTER(FUNC_LV_API);
 
 	/* TODO: FIXME */
-	*temp = tscpu_get_bL_temp((id == PTP_DET_LITTLE) ? THERMAL_BANK0 : THERMAL_BANK1);
+	*temp = tscpu_get_bL_temp((id == PTP_DET_LITTLE) ? THERMAL_CA7 : THERMAL_CA15);
 
 	for (i = 0; i < det->num_freq_tbl; i++)
 		volt[i] = VAL_TO_MV(det->volt_tbl_pmic[i]);

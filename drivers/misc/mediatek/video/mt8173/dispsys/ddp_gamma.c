@@ -291,7 +291,7 @@ static int disp_ccorr_set_coef(const DISP_CCORR_COEF_T __user *user_color_corr, 
 			if (old_ccorr != NULL)
 				kfree(old_ccorr);
 
-			disp_gamma_trigger_refresh(id);
+			disp_gamma_trigger_refresh((disp_gamma_id_t)id);
 		} else {
 			DDPERR("[GAMMA] disp_ccorr_set_coef: invalid ID = %d\n", id);
 			ret = -EFAULT;

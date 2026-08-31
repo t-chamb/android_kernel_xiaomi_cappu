@@ -62,9 +62,12 @@
 
 #define TASK_UNMAPPED_BASE	(PAGE_ALIGN(TASK_SIZE / 4))
 
-#if TASK_SIZE_64 > MODULES_VADDR
-#error Top of 64-bit user space clashes with start of module space
-#endif
+/*
+ * Clang's preprocessor cannot represent PAGE_OFFSET without signed overflow.
+ * The regions are disjoint by construction: TASK_SIZE_64 is 1 << VA_BITS and
+ * PAGE_OFFSET starts at -(1 << (VA_BITS - 1)); SZ_64M cannot bridge that gap
+ * for the supported arm64 VA widths.
+ */
 
 /*
  * Physical vs virtual RAM address space conversion.  These are

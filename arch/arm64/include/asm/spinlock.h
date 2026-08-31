@@ -37,29 +37,29 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 	arch_spinlock_t lockval, newval;
 
 	asm volatile(
-	/* Atomically increment the next ticket. */
+		/* Atomically increment the next ticket. */
 "	prfm	pstl1strm, %3\n"
 "1:	ldaxr	%w0, %3\n"
 "	add	%w1, %w0, %w5\n"
 "	stxr	%w2, %w1, %3\n"
 "	cbnz	%w2, 1b\n"
-	/* Did we get the lock? */
+		/* Did we get the lock? */
 "	eor	%w1, %w0, %w0, ror #16\n"
 "	cbz	%w1, 3f\n"
-	/*
-	 * No: spin on the owner. Send a local event to avoid missing an
-	 * unlock before the exclusive load.
-	 */
+		/*
+		 * No: spin on the owner. Send a local event to avoid missing an
+		 * unlock before the exclusive load.
+		 */
 "	sevl\n"
 "2:	wfe\n"
 "	ldaxrh	%w2, %4\n"
 "	eor	%w1, %w2, %w0, lsr #16\n"
 "	cbnz	%w1, 2b\n"
-	/* We got the lock. Critical section starts here. */
+		/* We got the lock. Critical section starts here. */
 "3:"
-	: "=&r" (lockval), "=&r" (newval), "=&r" (tmp), "+Q" (*lock)
-	: "Q" (lock->owner), "I" (1 << TICKET_SHIFT)
-	: "memory");
+		: "=&r" (lockval), "=&r" (newval), "=&r" (tmp), "+Q" (*lock)
+		: "Q" (lock->owner), "r" (1 << TICKET_SHIFT)
+		: "memory");
 }
 
 static inline int arch_spin_trylock(arch_spinlock_t *lock)
@@ -76,9 +76,9 @@ static inline int arch_spin_trylock(arch_spinlock_t *lock)
 "	stxr	%w1, %w0, %2\n"
 "	cbnz	%w1, 1b\n"
 "2:"
-	: "=&r" (lockval), "=&r" (tmp), "+Q" (*lock)
-	: "I" (1 << TICKET_SHIFT)
-	: "memory");
+		: "=&r" (lockval), "=&r" (tmp), "+Q" (*lock)
+		: "I" (1 << TICKET_SHIFT)
+		: "memory");
 
 	return !tmp;
 }
@@ -87,9 +87,9 @@ static inline void arch_spin_unlock(arch_spinlock_t *lock)
 {
 	asm volatile(
 "	stlrh	%w1, %0\n"
-	: "=Q" (lock->owner)
-	: "r" (lock->owner + 1)
-	: "memory");
+		: "=Q" (lock->owner)
+		: "r" (lock->owner + 1)
+		: "memory");
 }
 
 static inline int arch_spin_value_unlocked(arch_spinlock_t lock)
@@ -112,27 +112,23 @@ static inline int arch_spin_is_contended(arch_spinlock_t *lock)
 /*
  * Write lock implementation.
  *
- * Write locks set bit 31. Unlocking, is done by writing 0 since the lock is
- * exclusively held.
- *
- * The memory barriers are implicit with the load-acquire and store-release
- * instructions.
+ * Write locks are simple exclusive locks, so we just use the LL/SC sequence
+ * on the lock value and spin on the load-acquire until it becomes free.
  */
-
 static inline void arch_write_lock(arch_rwlock_t *rw)
 {
 	unsigned int tmp;
 
 	asm volatile(
-	"	sevl\n"
-	"1:	wfe\n"
-	"2:	ldaxr	%w0, %1\n"
-	"	cbnz	%w0, 1b\n"
-	"	stxr	%w0, %w2, %1\n"
-	"	cbnz	%w0, 2b\n"
-	: "=&r" (tmp), "+Q" (rw->lock)
-	: "r" (0x80000000)
-	: "memory");
+"	sevl\n"
+"1:	wfe\n"
+"	ldaxr	%w0, %1\n"
+"	cbnz	%w0, 1b\n"
+"	stxr	%w0, %w2, %1\n"
+"	cbnz	%w0, 1b\n"
+		: "=&r" (tmp), "+Q" (rw->lock)
+		: "r" (0x80000000)
+		: "memory");
 }
 
 static inline int arch_write_trylock(arch_rwlock_t *rw)
@@ -140,13 +136,13 @@ static inline int arch_write_trylock(arch_rwlock_t *rw)
 	unsigned int tmp;
 
 	asm volatile(
-	"	ldaxr	%w0, %1\n"
-	"	cbnz	%w0, 1f\n"
-	"	stxr	%w0, %w2, %1\n"
-	"1:\n"
-	: "=&r" (tmp), "+Q" (rw->lock)
-	: "r" (0x80000000)
-	: "memory");
+"	ldaxr	%w0, %1\n"
+"	cbnz	%w0, 1f\n"
+"	stxr	%w0, %w2, %1\n"
+"1:"
+		: "=&r" (tmp), "+Q" (rw->lock)
+		: "r" (0x80000000)
+		: "memory");
 
 	return !tmp;
 }
@@ -154,40 +150,32 @@ static inline int arch_write_trylock(arch_rwlock_t *rw)
 static inline void arch_write_unlock(arch_rwlock_t *rw)
 {
 	asm volatile(
-	"	stlr	%w1, %0\n"
-	: "=Q" (rw->lock) : "r" (0) : "memory");
+"	stlr	wzr, %0\n"
+		: "=Q" (rw->lock) : : "memory");
 }
-
-/* write_can_lock - would write_trylock() succeed? */
-#define arch_write_can_lock(x)		((x)->lock == 0)
 
 /*
  * Read lock implementation.
  *
  * It exclusively loads the lock value, increments it and stores the new value
- * back if positive and the CPU still exclusively owns the location. If the
- * value is negative, the lock is already held.
- *
- * During unlocking there may be multiple active read locks but no write lock.
- *
- * The memory barriers are implicit with the load-acquire and store-release
- * instructions.
+ * back if positive and the store is successful. If the lock value is negative,
+ * we spin until the writer releases the lock, yielding on each iteration.
  */
 static inline void arch_read_lock(arch_rwlock_t *rw)
 {
 	unsigned int tmp, tmp2;
 
 	asm volatile(
-	"	sevl\n"
-	"1:	wfe\n"
-	"2:	ldaxr	%w0, %2\n"
-	"	add	%w0, %w0, #1\n"
-	"	tbnz	%w0, #31, 1b\n"
-	"	stxr	%w1, %w0, %2\n"
-	"	cbnz	%w1, 2b\n"
-	: "=&r" (tmp), "=&r" (tmp2), "+Q" (rw->lock)
-	:
-	: "memory");
+"	sevl\n"
+"1:	wfe\n"
+"	ldaxr	%w0, %2\n"
+"	adds	%w0, %w0, #1\n"
+"	b.mi	1b\n"
+"	stxr	%w1, %w0, %2\n"
+"	cbnz	%w1, 1b\n"
+		: "=&r" (tmp), "=&r" (tmp2), "+Q" (rw->lock)
+		:
+		: "cc", "memory");
 }
 
 static inline void arch_read_unlock(arch_rwlock_t *rw)
@@ -195,13 +183,13 @@ static inline void arch_read_unlock(arch_rwlock_t *rw)
 	unsigned int tmp, tmp2;
 
 	asm volatile(
-	"1:	ldxr	%w0, %2\n"
-	"	sub	%w0, %w0, #1\n"
-	"	stlxr	%w1, %w0, %2\n"
-	"	cbnz	%w1, 1b\n"
-	: "=&r" (tmp), "=&r" (tmp2), "+Q" (rw->lock)
-	:
-	: "memory");
+"1:	ldxr	%w0, %2\n"
+"	sub	%w0, %w0, #1\n"
+"	stlxr	%w1, %w0, %2\n"
+"	cbnz	%w1, 1b\n"
+		: "=&r" (tmp), "=&r" (tmp2), "+Q" (rw->lock)
+		:
+		: "memory");
 }
 
 static inline int arch_read_trylock(arch_rwlock_t *rw)
@@ -209,36 +197,25 @@ static inline int arch_read_trylock(arch_rwlock_t *rw)
 	unsigned int tmp, tmp2 = 1;
 
 	asm volatile(
-	"	ldaxr	%w0, %2\n"
-	"	add	%w0, %w0, #1\n"
-	"	tbnz	%w0, #31, 1f\n"
-	"	stxr	%w1, %w0, %2\n"
-	"1:\n"
-	: "=&r" (tmp), "+r" (tmp2), "+Q" (rw->lock)
-	:
-	: "memory");
+"	ldaxr	%w0, %2\n"
+"	adds	%w0, %w0, #1\n"
+"	b.mi	1f\n"
+"	stxr	%w1, %w0, %2\n"
+"1:"
+		: "=&r" (tmp), "+r" (tmp2), "+Q" (rw->lock)
+		:
+		: "cc", "memory");
 
 	return !tmp2;
 }
 
-/* read_can_lock - would read_trylock() succeed? */
-#define arch_read_can_lock(x)		((x)->lock < 0x80000000)
-
 #define arch_read_lock_flags(lock, flags) arch_read_lock(lock)
 #define arch_write_lock_flags(lock, flags) arch_write_lock(lock)
 
-#define arch_spin_relax(lock)	cpu_relax()
-#define arch_read_relax(lock)	cpu_relax()
-#define arch_write_relax(lock)	cpu_relax()
+#define arch_read_can_lock(x)		((x)->lock < 0x80000000)
+#define arch_write_can_lock(x)		((x)->lock == 0)
 
-/*
- * Accesses appearing in program order before a spin_lock() operation
- * can be reordered with accesses inside the critical section, by virtue
- * of arch_spin_lock being constructed using acquire semantics.
- *
- * In cases where this is problematic (e.g. try_to_wake_up), an
- * smp_mb__before_spinlock() can restore the required ordering.
- */
-#define smp_mb__before_spinlock()	smp_mb()
+#define arch_read_relax(x)	cpu_relax()
+#define arch_write_relax(x)	cpu_relax()
 
 #endif /* __ASM_SPINLOCK_H */

@@ -23,9 +23,15 @@
 #include "trustzone/tz_cross/trustzone.h"
 
 /* / KREE session handle type. */
+#ifndef __KREE_SESSION_HANDLE_TYPE
+#define __KREE_SESSION_HANDLE_TYPE
 typedef uint32_t KREE_SESSION_HANDLE;
+#endif
 
+#ifndef __KREE_SHAREDMEM_HANDLE_TYPE
+#define __KREE_SHAREDMEM_HANDLE_TYPE
 typedef uint32_t KREE_SHAREDMEM_HANDLE;
+#endif
 
 
 /* Session Management */

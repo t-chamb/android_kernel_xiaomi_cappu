@@ -306,7 +306,8 @@ static int32_t cmdq_sec_fill_iwc_command_msg_unlocked(iwcCmdqMessage_t *pIwc,
 	/* metadata */
 	pIwc->command.metadata.enginesNeedDAPC = pTask->secData.enginesNeedDAPC;
 	pIwc->command.metadata.enginesNeedPortSecurity = pTask->secData.enginesNeedPortSecurity;
-	pIwc->command.metadata.secMode = pTask->secData.secMode;
+	pIwc->command.metadata.secMode =
+		(enum CMDQ_IWC_DISP_MODE)pTask->secData.secMode;
 
 
 	if (NULL != pTask && CMDQ_INVALID_THREAD != thread) {

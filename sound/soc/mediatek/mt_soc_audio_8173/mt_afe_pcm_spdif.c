@@ -251,9 +251,9 @@ static int mt_pcm_spdif_stop(struct snd_pcm_substream *substream)
 
 	mt_afe_enable_afe(false);
 
-	mt_afe_reset_dma_buffer(MT_AFE_DIGITAL_BLOCK_SPDIF);
+	mt_afe_reset_dma_buffer(MT_AFE_MEM_CTX_SPDIF);
 
-	mt_afe_remove_ctx_substream(MT_AFE_DIGITAL_BLOCK_SPDIF);
+	mt_afe_remove_ctx_substream(MT_AFE_MEM_CTX_SPDIF);
 
 	mt_afe_spdif2_clk_off();
 	mt_afe_disable_apll_div_power(MT_AFE_SPDIF2, runtime->rate);

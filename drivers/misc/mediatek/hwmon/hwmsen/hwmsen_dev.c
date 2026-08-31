@@ -655,7 +655,7 @@ static int hwmsen_enable(struct hwmdev_object *obj, int sensor, int enable)
 
 		}
 
-	} else if ((enable == 0)) {
+	} else if (enable == 0) {
 		/*{@for mt6582 blocking issue work around*/
 		if (sensor == 7) {
 			HWM_LOG("P-sensor enable LDO low power\n");

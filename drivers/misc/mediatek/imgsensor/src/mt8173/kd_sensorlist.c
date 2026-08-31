@@ -26,21 +26,8 @@
 /*#include <linux/xlog.h>*/
 #include <sync_write.h>
 /*#include <mt_typedefs.h>*/
-#ifndef MUINT8
-typedef unsigned char MUINT8;
-#endif
-#ifndef MUINT32
-typedef unsigned int MUINT32;
-#endif
-#ifndef UINT16
 typedef unsigned short UINT16;
-#endif
-#ifndef UINT32
 typedef unsigned int UINT32;
-#endif
-#ifndef MUINT8
-typedef signed int MINT32;
-#endif
 
 #ifndef FALSE
 #define FALSE (0)
@@ -48,10 +35,6 @@ typedef signed int MINT32;
 #ifndef TRUE
 #define TRUE  (1)
 #endif
-#ifndef BOOL
-typedef unsigned char BOOL;
-#endif
-
 #ifndef kal_uint32
 typedef unsigned int kal_uint32;
 #endif

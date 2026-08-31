@@ -58,7 +58,6 @@
 #ifdef CONFIG_MTK_HDMI_SUPPORT
 #include "extd_ddp.h"
 #endif
-#pragma GCC optimize("O0")
 
 
 /* --------------------------------------------------------------------------- */

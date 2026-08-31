@@ -1110,7 +1110,7 @@ static ssize_t show_sensordata_value(struct device_driver *ddri, char *buf)
 		mutex_unlock(&sense_data_mutex);
 	}
 
-	snprintf(strbuf, PAGE_SIZE, "%d %d %d %d %d %d %d %d %d\n", sensordata[0],
+	snprintf(strbuf, sizeof(strbuf), "%d %d %d %d %d %d %d %d %d\n", sensordata[0],
 		sensordata[1], sensordata[2], sensordata[3], sensordata[4],
 		sensordata[5], sensordata[6], sensordata[7], sensordata[8]);
 
@@ -1126,7 +1126,7 @@ static ssize_t show_posturedata_value(struct device_driver *ddri, char *buf)
 	tmp[0] = sensor_data[13] * CONVERT_O / CONVERT_O_DIV;
 	tmp[1] = sensor_data[14] * CONVERT_O / CONVERT_O_DIV;
 	tmp[2] = sensor_data[15] * CONVERT_O / CONVERT_O_DIV;
-	snprintf(strbuf, PAGE_SIZE, "%d, %d, %d\n", tmp[0], tmp[1], tmp[2]);
+	snprintf(strbuf, sizeof(strbuf), "%d, %d, %d\n", tmp[0], tmp[1], tmp[2]);
 
 	return snprintf(buf, PAGE_SIZE, "%s\n", strbuf);
 }
@@ -1732,7 +1732,7 @@ static long akm09912_unlocked_ioctl(struct file *file, unsigned int cmd,
 
 		mutex_unlock(&sensor_data_mutex);
 
-		snprintf(buff, PAGE_SIZE, "%x %x %x %x %x", osensor_data->values[0],
+		snprintf(buff, sizeof(buff), "%x %x %x %x %x", osensor_data->values[0],
 			osensor_data->values[1], osensor_data->values[2],
 			osensor_data->status, osensor_data->value_divide);
 		if (copy_to_user(argp, buff, strlen(buff) + 1))

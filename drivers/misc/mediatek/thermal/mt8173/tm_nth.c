@@ -510,10 +510,10 @@ static void tm_nth_loop(struct work_struct *work)
 		if (nth_state == 1) {
 			/* get temp and prev temp */
 			if (unlikely(prv_cpu_temp == -127000))
-				prv_cpu_temp = cur_cpu_temp = tscpu_get_bL_temp(THERMAL_BANK1);
+				prv_cpu_temp = cur_cpu_temp = tscpu_get_bL_temp(THERMAL_CA15);
 			else
 				prv_cpu_temp = cur_cpu_temp;
-			cur_cpu_temp = tscpu_get_bL_temp(THERMAL_BANK1);
+			cur_cpu_temp = tscpu_get_bL_temp(THERMAL_CA15);
 
 			/* calc tempError, tempErrorInt, tempErrotDer */
 			tempError = TGTTEMP - cur_cpu_temp;

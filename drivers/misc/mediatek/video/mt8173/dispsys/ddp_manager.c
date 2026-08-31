@@ -1203,6 +1203,7 @@ static int is_module_in_path(DISP_MODULE_ENUM module, ddp_path_handle handle)
 
 int dpmgr_path_user_cmd(disp_path_handle dp_handle, int msg, unsigned long arg, void *cmdqhandle)
 {
+	unsigned int cmd = msg;
 	int ret = -1;
 	DISP_MODULE_ENUM dst = DISP_MODULE_UNKNOWN;
 	ddp_path_handle handle = NULL;
@@ -1210,7 +1211,7 @@ int dpmgr_path_user_cmd(disp_path_handle dp_handle, int msg, unsigned long arg, 
 	ASSERT(dp_handle != NULL);
 	handle = (ddp_path_handle) dp_handle;
 	/* DISP_LOG_W("dpmgr_path_user_cmd msg 0x%08x\n",msg); */
-	switch (msg) {
+	switch (cmd) {
 	case DISP_IOCTL_AAL_EVENTCTL:
 	case DISP_IOCTL_AAL_GET_HIST:
 	case DISP_IOCTL_AAL_INIT_REG:

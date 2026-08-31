@@ -25,9 +25,8 @@
 #ifndef TRUE
 #define TRUE  (1)
 #endif
-#ifndef BOOL
+
 typedef unsigned char BOOL;
-#endif
 
 typedef enum {
 	VDD_None,
@@ -90,10 +89,6 @@ typedef struct {
 	PowerCustInfo PowerCustInfo[6];
 } PowerCust;
 
-
-#ifndef BOOL
-typedef unsigned char BOOL;
-#endif
 
 /* defined in kd_sensorlist.c */
 extern void ISP_MCLK1_EN(BOOL En);

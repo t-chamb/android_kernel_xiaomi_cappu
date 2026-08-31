@@ -1126,10 +1126,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_720x480p_60Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_RISING;
-			vsync_pol = HDMI_POLARITY_RISING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_RISING;
+			vsync_pol = DPI_POLARITY_RISING;
 
 			hsync_pulse_width = 62;
 			hsync_back_porch = 60;
@@ -1150,10 +1150,10 @@ void dpi_setting_res(u8 arg)
 	case HDMI_VIDEO_720x576p_50Hz:
 		{
 
-			clk_pol = HDMI_POLARITY_FALLING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_RISING;
-			vsync_pol = HDMI_POLARITY_RISING;
+			clk_pol = DPI_POLARITY_FALLING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_RISING;
+			vsync_pol = DPI_POLARITY_RISING;
 
 			hsync_pulse_width = 64;
 			hsync_back_porch = 68;
@@ -1174,10 +1174,10 @@ void dpi_setting_res(u8 arg)
 	case HDMI_VIDEO_1280x720p_60Hz:
 		{
 
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 40;
 			hsync_back_porch = 220;
@@ -1199,10 +1199,10 @@ void dpi_setting_res(u8 arg)
 	case HDMI_VIDEO_1280x720p_50Hz:
 		{
 
-			clk_pol = HDMI_POLARITY_FALLING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_FALLING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 40;
 			hsync_back_porch = 220;
@@ -1223,10 +1223,10 @@ void dpi_setting_res(u8 arg)
 	case HDMI_VIDEO_1920x1080i_60Hz:
 		{
 			/* fgInterlace = TRUE; */
-			clk_pol = HDMI_POLARITY_FALLING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_FALLING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1248,10 +1248,10 @@ void dpi_setting_res(u8 arg)
 	case HDMI_VIDEO_1920x1080i_50Hz:
 		{
 			/* fgInterlace = TRUE; */
-			clk_pol = HDMI_POLARITY_FALLING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_FALLING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1271,10 +1271,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_23Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1295,10 +1295,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_24Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1319,10 +1319,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_25Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1343,10 +1343,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_29Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1367,10 +1367,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_30Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1391,10 +1391,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_60Hz:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1415,10 +1415,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_1920x1080p_50Hz:
 		{
-			clk_pol = HDMI_POLARITY_FALLING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_FALLING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 44;
 			hsync_back_porch = 148;
@@ -1439,10 +1439,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2160P_30HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1463,10 +1463,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2160P_29_97HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1487,10 +1487,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2160P_25HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1511,10 +1511,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2160P_24HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1535,10 +1535,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2160P_23_976HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1559,10 +1559,10 @@ void dpi_setting_res(u8 arg)
 
 	case HDMI_VIDEO_2161P_24HZ:
 		{
-			clk_pol = HDMI_POLARITY_RISING;
-			de_pol = HDMI_POLARITY_RISING;
-			hsync_pol = HDMI_POLARITY_FALLING;
-			vsync_pol = HDMI_POLARITY_FALLING;
+			clk_pol = DPI_POLARITY_RISING;
+			de_pol = DPI_POLARITY_RISING;
+			hsync_pol = DPI_POLARITY_FALLING;
+			vsync_pol = DPI_POLARITY_FALLING;
 
 			hsync_pulse_width = 88;
 			hsync_back_porch = 296;
@@ -1590,10 +1590,10 @@ void dpi_setting_res(u8 arg)
 	extd_dpi_params.dispif_config.dpi.bg_width = p->bg_width;
 	extd_dpi_params.dispif_config.dpi.bg_height = p->bg_width;
 
-	extd_dpi_params.dispif_config.dpi.clk_pol = clk_pol;
-	extd_dpi_params.dispif_config.dpi.de_pol = de_pol;
-	extd_dpi_params.dispif_config.dpi.vsync_pol = vsync_pol;
-	extd_dpi_params.dispif_config.dpi.hsync_pol = hsync_pol;
+	extd_dpi_params.dispif_config.dpi.clk_pol = (LCM_POLARITY)clk_pol;
+	extd_dpi_params.dispif_config.dpi.de_pol = (LCM_POLARITY)de_pol;
+	extd_dpi_params.dispif_config.dpi.vsync_pol = (LCM_POLARITY)vsync_pol;
+	extd_dpi_params.dispif_config.dpi.hsync_pol = (LCM_POLARITY)hsync_pol;
 
 	extd_dpi_params.dispif_config.dpi.hsync_pulse_width = hsync_pulse_width;
 	extd_dpi_params.dispif_config.dpi.hsync_back_porch = hsync_back_porch;

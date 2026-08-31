@@ -206,7 +206,7 @@ struct ft5x46_mode_switch {
 
 struct ft5x46_data *ft_data;
 
-static int ft5x46_recv_byte(struct ft5x46_data *ft5x46, u8 len, ...)
+static int ft5x46_recv_byte(struct ft5x46_data *ft5x46, unsigned int len, ...)
 {
 	int error;
 	va_list varg;
@@ -236,7 +236,7 @@ static int ft5x46_recv_block(struct ft5x46_data *ft5x46,
 	return ft5x46->bops->recv(ft5x46->dev, buf, len);
 }
 
-static int ft5x46_send_byte(struct ft5x46_data *ft5x46, u8 len, ...)
+static int ft5x46_send_byte(struct ft5x46_data *ft5x46, unsigned int len, ...)
 {
 	va_list varg;
 	u8 i, buf[len];

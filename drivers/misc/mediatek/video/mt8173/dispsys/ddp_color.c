@@ -1685,15 +1685,16 @@ static int _color_set_listener(DISP_MODULE_ENUM module, ddp_module_notify notify
 
 static int _color_io(DISP_MODULE_ENUM module, int msg, unsigned long arg, void *cmdq)
 {
+	unsigned int cmd = msg;
 	int ret = 0;
 	int value = 0;
 	DISP_PQ_PARAM *pq_param;
 	DISPLAY_PQ_T *pq_index;
 	DISPLAY_TDSHP_T *tdshp_index;
 
-	COLOR_DBG("_color_io: msg %x\n", msg);
+	COLOR_DBG("_color_io: msg %x\n", cmd);
 
-	switch (msg) {
+	switch (cmd) {
 	case DISP_IOCTL_SET_PQPARAM:
 		/* case DISP_IOCTL_SET_C0_PQPARAM: */
 

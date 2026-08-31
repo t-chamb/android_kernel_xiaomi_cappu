@@ -74,7 +74,14 @@ struct thread_info {
 /*
  * how to get the current stack pointer from C
  */
-register unsigned long current_stack_pointer asm ("sp");
+static __always_inline unsigned long read_current_stack_pointer(void)
+{
+	unsigned long sp;
+
+	asm("mov %0, sp" : "=r" (sp));
+	return sp;
+}
+#define current_stack_pointer read_current_stack_pointer()
 
 /*
  * how to get the thread information struct from C

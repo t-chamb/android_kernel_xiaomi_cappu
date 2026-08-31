@@ -34,7 +34,7 @@
 #define MVAGRAPH_INDEX(mva) (mva>>MVA_BLOCK_SIZE_ORDER)
 
 
-static short mvaGraph[MVA_MAX_BLOCK_NR + 1];
+static unsigned short mvaGraph[MVA_MAX_BLOCK_NR + 1];
 static void *mvaInfoGraph[MVA_MAX_BLOCK_NR + 1];
 static DEFINE_SPINLOCK(gMvaGraph_lock);
 
@@ -43,7 +43,7 @@ void m4u_mvaGraph_init(void *priv_reserve)
 	unsigned long irq_flags;
 
 	spin_lock_irqsave(&gMvaGraph_lock, irq_flags);
-	memset(mvaGraph, 0, sizeof(short) * (MVA_MAX_BLOCK_NR + 1));
+	memset(mvaGraph, 0, sizeof(mvaGraph));
 	memset(mvaInfoGraph, 0, sizeof(void *) * (MVA_MAX_BLOCK_NR + 1));
 	mvaGraph[0] = 1 | MVA_BUSY_MASK;
 	mvaInfoGraph[0] = priv_reserve;

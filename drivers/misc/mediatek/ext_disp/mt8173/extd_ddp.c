@@ -892,7 +892,7 @@ static int _build_path_decouple(void)
 	ret = dpmgr_path_config(pgc->dpmgr_handle, pconfig, pgc->cmdq_handle_config);
 #else
 	/*ret = dpmgr_path_reset(pgc->dpmgr_handle, CMDQ_DISABLE); */
-	ret = dpmgr_path_config(pgc->dpmgr_handle, pconfig, CMDQ_DISABLE);
+	ret = dpmgr_path_config(pgc->dpmgr_handle, pconfig, NULL);
 	/* need start and trigger */
 	ret = dpmgr_path_start(pgc->dpmgr_handle, CMDQ_DISABLE);
 	ret = dpmgr_path_trigger(pgc->dpmgr_handle, NULL, CMDQ_DISABLE);
@@ -1864,7 +1864,7 @@ int ext_disp_init(struct platform_device *dev, char *lcm_name, unsigned int sess
 		data_config->dst_h /= 2;
 	data_config->dst_dirty = 1;
 
-	ret = dpmgr_path_config(pgc->dpmgr_handle, data_config, CMDQ_DISABLE);
+	ret = dpmgr_path_config(pgc->dpmgr_handle, data_config, NULL);
 
 	if (!extd_drv_is_inited(pgc->plcm))
 		ret = extd_drv_init(dev, pgc->plcm);

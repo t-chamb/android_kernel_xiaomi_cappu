@@ -24,7 +24,10 @@
 #endif
 
 /* dump mmsys config */
+#ifndef __CMDQ_DUMP_MMSYS_CONFIG_TYPE
+#define __CMDQ_DUMP_MMSYS_CONFIG_TYPE
 typedef void (*CmdqDumpMMSYSConfig) (void);
+#endif
 
 /* VENC callback function */
 typedef int32_t(*CmdqVEncDumpInfo) (uint64_t engineFlag, int level);

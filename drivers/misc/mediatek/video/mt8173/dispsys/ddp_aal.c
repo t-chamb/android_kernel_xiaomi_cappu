@@ -462,9 +462,10 @@ int aal_bypass(DISP_MODULE_ENUM module, int bypass)
 
 static int aal_io(DISP_MODULE_ENUM module, int msg, unsigned long arg, void *cmdq)
 {
+	unsigned int cmd = msg;
 	int ret = 0;
 
-	switch (msg) {
+	switch (cmd) {
 	case DISP_IOCTL_AAL_EVENTCTL:
 		{
 			int enabled;

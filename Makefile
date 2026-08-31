@@ -397,6 +397,12 @@ LINUXINCLUDE    := \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
+# This 3.18 tree predates Clang's integrated cross-target setup. Android's
+# kernel wrapper exports CLANG_TRIPLE, so pass it to Clang explicitly.
+ifneq ($(CLANG_TRIPLE),)
+KBUILD_CPPFLAGS += --target=$(patsubst %-,%,$(CLANG_TRIPLE))
+endif
+
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
@@ -628,6 +634,16 @@ KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
 KBUILD_CFLAGS   += $(call cc-disable-warning, misleading-indentation)
 KBUILD_CFLAGS   += $(call cc-disable-warning, duplicate-decl-specifier)
 KBUILD_CFLAGS   += $(call cc-disable-warning, logical-not-parentheses)
+
+# Clang diagnoses operand-width inference used throughout this old arm64 tree.
+# The assembly templates select the intended register width through %w/%x.
+ifeq ($(COMPILER),clang)
+KBUILD_CFLAGS   += -fno-builtin-bcmp -fno-builtin-stpcpy
+KBUILD_CFLAGS   += -Wno-asm-operand-widths
+KBUILD_CFLAGS   += -Wno-unneeded-internal-declaration -Wno-unused-function
+KBUILD_CFLAGS   += -Wno-pointer-bool-conversion -Wno-void-pointer-to-enum-cast
+KBUILD_CFLAGS   += -Wno-address-of-packed-member
+endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
 KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)

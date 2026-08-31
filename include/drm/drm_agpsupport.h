@@ -12,8 +12,11 @@
 struct drm_device;
 struct drm_file;
 
-#define __OS_HAS_AGP (defined(CONFIG_AGP) || (defined(CONFIG_AGP_MODULE) && \
-					      defined(MODULE)))
+#if defined(CONFIG_AGP) || (defined(CONFIG_AGP_MODULE) && defined(MODULE))
+#define __OS_HAS_AGP 1
+#else
+#define __OS_HAS_AGP 0
+#endif
 
 struct drm_agp_head {
 	struct agp_kern_info agp_info;

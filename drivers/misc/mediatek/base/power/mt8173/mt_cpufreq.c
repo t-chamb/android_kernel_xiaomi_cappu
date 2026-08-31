@@ -1336,7 +1336,7 @@ static enum turbo_mode get_turbo_mode(struct mt_cpu_dvfs *p, unsigned int target
 {
 	enum turbo_mode mode = TURBO_MODE_NONE;
 	int temp =
-	    tscpu_get_bL_temp(cpu_dvfs_is(p, MT_CPU_DVFS_LITTLE) ? THERMAL_BANK0 : THERMAL_BANK1);
+	    tscpu_get_bL_temp(cpu_dvfs_is(p, MT_CPU_DVFS_LITTLE) ? THERMAL_CA7 : THERMAL_CA15);
 	int num_online_cpus_little = 0, num_online_cpus_big = 0;
 	int i;
 
@@ -2642,7 +2642,7 @@ static void _downgrade_freq_check(enum mt_cpu_dvfs_id id)
 #else
 
 #if !defined(CONFIG_FPGA_EARLY_PORTING)
-	temp = tscpu_get_bL_temp((MT_CPU_DVFS_LITTLE == id) ? THERMAL_BANK0 : THERMAL_BANK1);
+	temp = tscpu_get_bL_temp((MT_CPU_DVFS_LITTLE == id) ? THERMAL_CA7 : THERMAL_CA15);
 #endif
 #endif
 

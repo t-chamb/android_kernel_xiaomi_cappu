@@ -25,7 +25,10 @@
 
 
 /* / KREE session handle type. */
+#ifndef __KREE_SESSION_HANDLE_TYPE
+#define __KREE_SESSION_HANDLE_TYPE
 typedef uint32_t KREE_SESSION_HANDLE;
+#endif
 
 #define KREE_SESSION_HANDLE_NULL    ((KREE_SESSION_HANDLE)0)
 #define KREE_SESSION_HANDLE_FAIL    ((KREE_SESSION_HANDLE)-1)
@@ -43,7 +46,10 @@ typedef uint32_t KREE_SESSION_HANDLE;
  */
 
 /* Shared memory handle define */
+#ifndef __KREE_SHAREDMEM_HANDLE_TYPE
+#define __KREE_SHAREDMEM_HANDLE_TYPE
 typedef uint32_t KREE_SHAREDMEM_HANDLE;
+#endif
 
 /* Secure memory handle define */
 typedef uint32_t KREE_SECUREMEM_HANDLE;

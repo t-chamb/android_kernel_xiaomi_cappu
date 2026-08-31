@@ -20,6 +20,9 @@ obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
 ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
+# Clang's -mgeneral-regs-only disables the AES/NEON target features even after
+# -march=armv8-a+crypto, so remove it for this one kernel-NEON implementation.
+CFLAGS_REMOVE_aes-ce-cipher.o := -mgeneral-regs-only
 CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
 
 obj-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o

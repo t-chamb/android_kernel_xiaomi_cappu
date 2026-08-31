@@ -626,10 +626,10 @@ static void ep0_rxstate(struct musb *musb)
 		/*REVISIT-J: 64 is usb20 ep0 maxp, but usb30 ep0 maxp is 512. Do we need the modification? */
 		if (count < maxp || req->actual == req->length) {
 			/* musb->ep0_state = MUSB_EP0_STAGE_STATUSIN; */
-			musb->ep0_state = MUSB_EP0_IDLE;
+			musb->ep0_state = MUSB_EP0_STAGE_IDLE;
 			/* in ssusb, there is no interrupt to transit to idle phase. */
 			mu3d_dbg(K_DEBUG,
-				 "----- ep0 state: MUSB_EP0_STAGE_STATUSIN then MUSB_EP0_IDLE\n");
+				 "----- ep0 state: MUSB_EP0_STAGE_STATUSIN then MUSB_EP0_STAGE_IDLE\n");
 
 			csr |= EP0_DATAEND;
 		} else
