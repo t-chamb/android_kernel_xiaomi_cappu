@@ -157,6 +157,9 @@ struct uart_history_data {
 static struct uart_history_data tx_history;
 static struct uart_history_data rx_history;
 
+/* Set while a port's interrupt line is requested (between startup and shutdown). */
+static bool mtk_uart_irq_live[UART_NR];
+
 #if defined(MTK_BCM_BT_LPM)
 struct bcm_bt_lpm {
 	int bt_host_wake_gpio;
@@ -167,7 +170,20 @@ struct bcm_bt_lpm {
 
 	struct hrtimer wake_peer_timer;    /* control wake peer stop */
 	ktime_t wake_peer_delay;
+
+	/*
+	 * The chip raises CTS the moment dev_wake goes high, but it loses
+	 * whatever is sent in the first milliseconds after waking up (an HCI
+	 * command sent right then was never answered and the Bluetooth stack
+	 * aborted with a command timeout). Hold transmission back for a short
+	 * settling time after waking the chip, as mainline's hci_bcm does
+	 * (15 ms in bcm_resume_device()).
+	 */
+	struct hrtimer settle_timer;
+	int settling;
 } bt_lpm_pdata;
+#define BT_WAKE_SETTLE_MS 15
+static enum hrtimer_restart bt_wake_settle_done(struct hrtimer *timer);
 
 struct mtk_uart *bcm_bt_port = &mtk_uarts[1];        /* ttyMT1 for bcm bt uart channal*/
 #endif
@@ -800,6 +816,9 @@ static int mtk_uart_bt_wake_peer_activity(void)
 		}
 
 		bt_lpm_pdata.bt_dev_wake_enabled = 1;
+		bt_lpm_pdata.settling = 1;
+		hrtimer_start(&bt_lpm_pdata.settle_timer, ms_to_ktime(BT_WAKE_SETTLE_MS),
+			      HRTIMER_MODE_REL);
 	}
 
 	hrtimer_start(&bt_lpm_pdata.wake_peer_timer, bt_lpm_pdata.wake_peer_delay,
@@ -826,6 +845,9 @@ static int  mtk_uart_init_bt_lpm(void)
 	/* wake peer timer set 1 sec to check need disable dev_wake pin or not */
 	bt_lpm_pdata.wake_peer_delay = ktime_set(1, 0);
 	bt_lpm_pdata.wake_peer_timer.function = bt_wake_peer_timeout;
+	hrtimer_init(&bt_lpm_pdata.settle_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+	bt_lpm_pdata.settle_timer.function = bt_wake_settle_done;
+	bt_lpm_pdata.settling = 0;
 
 
 	/* get host_wake irq */
@@ -1770,6 +1792,14 @@ static void mtk_uart_tx_chars(struct mtk_uart *uart)
 	struct circ_buf *xmit = &port->state->xmit;
 	int count;
 
+#if defined(MTK_BCM_BT_LPM)
+	/* the Bluetooth chip is still waking up: bt_wake_settle_done() restarts us */
+	if (uart == bcm_bt_port && bt_lpm_pdata.settling) {
+		mtk_uart_disable_intrs(uart, UART_IER_ETBEI);
+		return;
+	}
+#endif
+
 	/* deal with x_char first */
 	if (unlikely(port->x_char)) {
 		MSG(INFO, "detect x_char!!\n");
@@ -1968,6 +1998,11 @@ static void mtk_uart_start_tx(struct uart_port *port)
 	if (!size)
 		return;
 
+#if defined(MTK_BCM_BT_LPM)
+	if (uart == bcm_bt_port && bt_lpm_pdata.settling)
+		return;
+#endif
+
 	uart->tx_stop = 0;
 #ifdef ENABLE_RAW_DATA_DUMP
 	reset_tx_raw_data(uart);
@@ -1987,8 +2022,38 @@ static void mtk_uart_start_tx(struct uart_port *port)
 #endif
 		if (uart->write_allow(uart))
 			mtk_uart_tx_chars(uart);
+		else
+			/*
+			 * The holding register is still occupied, so nothing
+			 * can be written now. Make sure the "transmitter
+			 * empty" interrupt is on, or nothing will ever call
+			 * mtk_uart_tx_chars() again: mtk_uart_stop_tx() turned
+			 * it off. This is hit when the Bluetooth chip drops
+			 * CTS with a byte in the register and raises it again:
+			 * the core restarts the transmitter from the CTS
+			 * interrupt while that byte is still being shifted out
+			 * (87 us at 115200 baud), and the rest of the command
+			 * was never sent.
+			 */
+			mtk_uart_enable_intrs(uart, UART_IER_ETBEI);
 	}
 }
+
+#if defined(MTK_BCM_BT_LPM)
+static enum hrtimer_restart bt_wake_settle_done(struct hrtimer *timer)
+{
+	struct uart_port *port = &bcm_bt_port->port;
+	unsigned long flags;
+
+	spin_lock_irqsave(&port->lock, flags);
+	bt_lpm_pdata.settling = 0;
+	if (mtk_uart_irq_live[bcm_bt_port->nport] && port->state && port->state->xmit.buf &&
+	    !uart_tx_stopped(port))
+		mtk_uart_start_tx(port);
+	spin_unlock_irqrestore(&port->lock, flags);
+	return HRTIMER_NORESTART;
+}
+#endif
 
 /*---------------------------------------------------------------------------*/
 static void mtk_uart_send_xchar(struct uart_port *port, char ch)
@@ -2058,6 +2123,7 @@ static int mtk_uart_startup(struct uart_port *port)
 #endif
 	if (ret)
 		return ret;
+	mtk_uart_irq_live[uart->nport] = true;
 
 #if defined(ENABLE_VFIFO)
 #if defined(ENABLE_VFIFO_DEBUG)
@@ -2157,6 +2223,13 @@ static void mtk_uart_shutdown(struct uart_port *port)
 	mtk_uart_fifo_flush(uart);
 
 	/* release irq line */
+	mtk_uart_irq_live[uart->nport] = false;
+#if defined(MTK_BCM_BT_LPM)
+	if (uart == bcm_bt_port) {
+		hrtimer_cancel(&bt_lpm_pdata.settle_timer);
+		bt_lpm_pdata.settling = 0;
+	}
+#endif
 	free_irq(port->irq, port);
 
 	mtk_uart_enable_dpidle(uart);
@@ -2208,6 +2281,7 @@ EXPORT_SYMBOL(mtk_uart_update_sysclk);
  */
 static void mtk_uart_set_termios(struct uart_port *port, struct ktermios *termios, struct ktermios *old)
 {
+	bool irq_was_live;
 	struct mtk_uart *uart = (struct mtk_uart *)port;
 	unsigned long flags;
 	unsigned int baud;
@@ -2245,6 +2319,21 @@ static void mtk_uart_set_termios(struct uart_port *port, struct ktermios *termio
 		else
 			parity = 2;	/* even */
 	}
+
+	/*
+	 * Keep the interrupt handler out while the registers are reprogrammed.
+	 * Setting the baud rate and the flow control mode switches LCR so that
+	 * the divisor latches and EFR appear at the addresses of THR/IER and
+	 * IIR. The handler does not take the port lock before it reads IIR, and
+	 * its paths update IER with read-modify-write: when it ran on another
+	 * CPU inside that window it read the divisor latch as IER and wrote it
+	 * back to the real IER a moment later, clearing the receive and modem
+	 * status interrupt enables. The port was then deaf until reopened
+	 * (Bluetooth: "Firmware configured in 9 s" and a retry).
+	 */
+	irq_was_live = mtk_uart_irq_live[uart->nport];
+	if (irq_was_live)
+		disable_irq(port->irq);
 
 	spin_lock_irqsave(&port->lock, flags);
 
@@ -2314,6 +2403,8 @@ static void mtk_uart_set_termios(struct uart_port *port, struct ktermios *termio
 		uart->port.cons->cflag = termios->c_cflag;
 
 	spin_unlock_irqrestore(&port->lock, flags);
+	if (irq_was_live)
+		enable_irq(port->irq);
 }
 
 /*---------------------------------------------------------------------------*/

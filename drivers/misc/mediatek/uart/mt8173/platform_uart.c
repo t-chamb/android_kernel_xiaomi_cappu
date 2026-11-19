@@ -1857,6 +1857,20 @@ void mtk_uart_get_modem_status(struct mtk_uart *uart)
 
 	delta = status ^ uart->old_status;
 
+	/*
+	 * old_status is only refreshed here, so after the port has been closed
+	 * and reopened it can still hold the CTS level of the previous session.
+	 * When the Bluetooth chip is powered up, CTS is low as the port opens
+	 * and the serial core stops the transmitter (hw_stopped); if the status
+	 * interrupt for that low level is not seen first, the later rise shows
+	 * no delta against the stale "high" and the transmitter is never
+	 * released. Treat a CTS level that disagrees with the core's flow state
+	 * as a change.
+	 */
+	if (uart->ms_enable && uart_cts_enabled(port) &&
+	    !!port->hw_stopped == !!(status & UART_MSR_CTS))
+		delta |= UART_MSR_CTS;
+
 	if (!delta)
 		return;
 
