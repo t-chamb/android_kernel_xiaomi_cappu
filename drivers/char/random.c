@@ -1351,6 +1351,20 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
 	if (nbytes == 0)
 		return 0;
 
+	/*
+	 * Once the non-blocking pool has been seeded, serve /dev/random and
+	 * getrandom(GRND_RANDOM) from it instead of blocking on the entropy
+	 * estimate, as mainline does since v5.6 ("random: make /dev/random be
+	 * almost like /dev/urandom"). This board has no hardware RNG and an
+	 * idle system credits about one bit per second, so a library that
+	 * seeds itself from /dev/random (mbedTLS does) otherwise stalls its
+	 * process for minutes.
+	 */
+	if (likely(nonblocking_pool.initialized)) {
+		nbytes = min_t(size_t, nbytes, INT_MAX >> (ENTROPY_SHIFT + 3));
+		return extract_entropy_user(&nonblocking_pool, buf, nbytes);
+	}
+
 	nbytes = min_t(size_t, nbytes, SEC_XFER_SIZE);
 	while (1) {
 		n = extract_entropy_user(&blocking_pool, buf, nbytes);
@@ -1406,7 +1420,8 @@ random_poll(struct file *file, poll_table * wait)
 	poll_wait(file, &random_read_wait, wait);
 	poll_wait(file, &random_write_wait, wait);
 	mask = 0;
-	if (ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
+	if (nonblocking_pool.initialized ||
+	    ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
 		mask |= POLLIN | POLLRDNORM;
 	if (ENTROPY_BITS(&input_pool) < random_write_wakeup_bits)
 		mask |= POLLOUT | POLLWRNORM;
