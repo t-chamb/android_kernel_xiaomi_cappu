@@ -60,6 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "pvr_debug.h"
 #include "pvr_notifier.h"
 #include "rgxfwutils.h"
+#include "pvr_guilty_kill.h"
 #include "rgx_options.h"
 #include "rgx_fwif.h"
 #include "rgx_fwif_alignchecks.h"
@@ -644,6 +645,7 @@ struct _RGX_SERVER_COMMON_CONTEXT_ {
 	DLLIST_NODE sListNode;
 	RGXFWIF_CONTEXT_RESET_REASON eLastResetReason;
 	IMG_UINT32 ui32LastResetJobRef;
+	IMG_PID pidOwner;
 };
 
 PVRSRV_ERROR FWCommonContextAllocate(CONNECTION_DATA *psConnection,
@@ -712,6 +714,7 @@ PVRSRV_ERROR FWCommonContextAllocate(CONNECTION_DATA *psConnection,
 	psServerCommonContext->eLastResetReason    = RGXFWIF_CONTEXT_RESET_REASON_NONE;
 	psServerCommonContext->ui32LastResetJobRef = 0;
 	psServerCommonContext->ui32ContextID       = psDevInfo->ui32CommonCtxtCurrentID++;
+	psServerCommonContext->pidOwner            = OSGetCurrentClientProcessIDKM();
 
 	/* Allocate the client CCB */
 	eError = RGXCreateCCB(psDevInfo,
@@ -3833,6 +3836,7 @@ void RGXCheckFirmwareCCB(PVRSRV_RGXDEV_INFO *psDevInfo)
 				IMG_UINT32 ui32ServerCommonContextID =
 					psCmdContextResetNotification->ui32ServerCommonContextID;
 				RGX_SERVER_COMMON_CONTEXT *psServerCommonContext = NULL;
+				IMG_PID pidGuilty = 0;
 
 				OSWRLockAcquireRead(psDevInfo->hCommonCtxtListLock);
 				dllist_foreach_node(&psDevInfo->sCommonCtxtListHead, psNode, psNext)
@@ -3857,8 +3861,18 @@ void RGXCheckFirmwareCCB(PVRSRV_RGXDEV_INFO *psDevInfo)
 				{
 					psServerCommonContext->eLastResetReason    = psCmdContextResetNotification->eResetReason;
 					psServerCommonContext->ui32LastResetJobRef = psCmdContextResetNotification->ui32ResetJobRef;
+					if (psServerCommonContext->eLastResetReason == RGXFWIF_CONTEXT_RESET_REASON_GUILTY_LOCKUP ||
+					    psServerCommonContext->eLastResetReason == RGXFWIF_CONTEXT_RESET_REASON_GUILTY_OVERRUNING)
+					{
+						pidGuilty = psServerCommonContext->pidOwner;
+					}
 				}
 				OSWRLockReleaseRead(psDevInfo->hCommonCtxtListLock);
+
+				if (pidGuilty)
+				{
+					PVRKillGuiltyApp(pidGuilty, (IMG_UINT32)psCmdContextResetNotification->eResetReason);
+				}
 
 				if (psCmdContextResetNotification->bPageFault)
 				{

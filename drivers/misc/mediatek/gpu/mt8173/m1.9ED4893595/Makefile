@@ -90,6 +90,7 @@ pvrsrvkm-y += \
 	services/server/common/devicemem_history_server.o \
 	services/server/env/linux/handle_idr.o \
 	services/server/env/linux/pvr_gputrace.o \
+	services/server/env/linux/pvr_guilty_kill.o \
 	services/server/env/linux/sync_native_server.o \
 	services/server/env/linux/trace_events.o \
 	services/server/devices/rgx/env/linux/km/rgxfwload.o \
